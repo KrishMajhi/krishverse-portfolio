@@ -1,4 +1,4 @@
-  // ---- AUDIO: web-shot SFX, played only on meaningful actions ----
+// ---- AUDIO: web-shot SFX, played only on meaningful actions ----
   // Rules: once on first entry, on mobile menu open, on major nav clicks,
   // on entering a project universe, on special interactions. NEVER on hover loops.
   //
@@ -280,13 +280,13 @@
   if (!prefersReducedMotion) {
     const heroName = document.querySelector('.hero-name');
     setInterval(() => {
-      if (Math.random() > 0.85) {
+      if (Math.random() > 0.55) {
         heroName.style.textShadow = '6px 2px 0 var(--red), -4px -2px 0 rgba(0,200,255,0.3), 12px 12px 0 rgba(0,0,0,0.4)';
         setTimeout(() => {
           heroName.style.textShadow = '4px 4px 0 var(--red), 8px 8px 0 var(--red-dark), 12px 12px 0 rgba(0,0,0,0.4)';
         }, 80);
       }
-    }, 2000);
+    }, 1200);
   }
 
   // ---- CONTACT FORM ----
@@ -398,4 +398,3 @@
       projectsTitle.classList.remove('projects-glitch');
     });
   })();
-
