@@ -186,7 +186,7 @@ window.SFX_ENABLED = false;
     function typeLine(line, onDone) {
       textEl.textContent = '';
       let i = 0;
-      const speed = 52;
+      const speed = 64;
       function step() {
         if (i < line.length) {
           textEl.textContent += line[i];
@@ -259,18 +259,16 @@ window.SFX_ENABLED = false;
     }
 
     function startSwing() {
-      // Sound fires FIRST — a full 1s before the GIF itself appears and
-      // starts swinging. This is the "incoming" cue: the thwip plays
-      // while the dialogue box is still on screen, then a beat later
-      // the box leaves and the swing scene actually begins.
+      // Sound fires the instant the glitch stops (box is about to leave),
+      // then there's a short beat before the GIF itself actually starts —
+      // splitting the gap so the cue reads as "in between" rather than
+      // tied hard to either edge.
+      stopDialogueGlitch();
       playIntroThwip();
 
       setTimer(() => {
         boxWrap.classList.remove('pop');
         boxWrap.classList.add('leave');
-        // The glitch has been looping continuously since it started;
-        // stop it here as the box actually leaves the scene.
-        stopDialogueGlitch();
         // Adding `.go` here (not earlier) is what starts the 2.7s
         // ciSwingerPop CSS animation on the GIF wrapper — it has to
         // line up with the `src` assignment below, or the wrapper
@@ -281,7 +279,7 @@ window.SFX_ENABLED = false;
         // (it's only on data-src) so the browser doesn't decode/play
         // its frames in the background while the dialogue scene runs.
         // Assigning `src` here is what actually starts the GIF's own
-        // internal animation loop, exactly 1000ms after the SFX fired.
+        // internal animation loop.
         if (swinger && swinger.dataset.src && !swinger.src) {
           swinger.src = swinger.dataset.src;
         }
@@ -290,20 +288,27 @@ window.SFX_ENABLED = false;
         // elapsed — i.e. 2700ms from this exact moment, matching the
         // ciSwingerPop CSS animation duration in css/intro.css.
         setTimer(blackoutAndReveal, SWING_SCENE_TOTAL_MS);
-      }, 1000);
+      }, 300);
     }
 
     function blackoutAndReveal() {
       atmosphere.classList.remove('show');
       blackout.classList.add('flash');
+      // Beat 1: hold fully black for a moment once the flash settles,
+      // so the cut to dark reads as a deliberate pause, not a flicker.
       setTimer(() => {
-        intro.classList.add('done');
+        // Beat 2: start revealing the portfolio (blur/scale-settle) while
+        // still hidden behind the solid black blackout layer — this way
+        // the portfolio is already easing into place by the time the
+        // black layer itself starts to fade, instead of popping in after.
         document.body.classList.add('ci-revealing');
+        intro.classList.add('done');
+        blackout.classList.add('fade-out');
         setTimer(() => {
           intro.style.display = 'none';
           document.body.classList.remove('ci-revealing');
         }, 700);
-      }, 280);
+      }, 480);
     }
 
     // ── SKIP BUTTON ──────────────────────────────────────────────────────
@@ -333,10 +338,14 @@ window.SFX_ENABLED = false;
 
     // Scene 1 — black screen, brief beat
     setTimer(() => {
-      // Scene 2 — atmosphere + dialogue box pop in
+      // Scene 2 — atmosphere eases in first, dialogue box follows a beat
+      // later, so the screen feels like it's gradually waking up rather
+      // than everything appearing in the same instant.
       atmosphere.classList.add('show');
-      boxWrap.classList.add('pop');
-      setTimer(() => runLines(0), 350);
-    }, 350);
+      setTimer(() => {
+        boxWrap.classList.add('pop');
+        setTimer(() => runLines(0), 350);
+      }, 220);
+    }, 500);
   })();
   // ─────────────────────────────────────────────────────────────────────────
