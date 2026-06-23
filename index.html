@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KRISHVERSE — Krish Majhi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- ════════════════════════════════════════════════════════════════════
+     STYLESHEETS — load order matters: intro first, then base, then
+     sections, then effects (later files can safely override earlier
+     ones since they load after).
+═══════════════════════════════════════════════════════════════════════ -->
+<link rel="stylesheet" href="css/intro.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/sections.css">
+<link rel="stylesheet" href="css/effects.css">
+</head>
+<body class="loading">
+<!-- SVG filter: paint-roughen for Spider-Verse hero name texture -->
+<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
+  <defs>
+    <filter id="sv-roughen" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.055 0.07" numOctaves="3" seed="8" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+      <feComposite in="displaced" in2="SourceGraphic" operator="over"/>
+    </filter>
+  </defs>
+</svg>
+
+<div id="comic-intro">
+  <div class="ci-atmosphere" id="ciAtmosphere">
+    <div class="ci-halftone"></div>
+    <div class="ci-edge-glow"></div>
+    <div class="ci-panel-lines"></div>
+    <div class="ci-particle" style="left:18%; top:70%; animation-delay:0s;"></div>
+    <div class="ci-particle" style="left:32%; top:30%; animation-delay:0.6s;"></div>
+    <div class="ci-particle" style="left:62%; top:60%; animation-delay:1.1s;"></div>
+    <div class="ci-particle" style="left:78%; top:25%; animation-delay:1.7s;"></div>
+    <div class="ci-particle" style="left:50%; top:80%; animation-delay:0.3s;"></div>
+    <div class="ci-particle" style="left:88%; top:55%; animation-delay:2.1s;"></div>
+  </div>
+
+  <div class="ci-box-wrap intro-dialogue" id="ciBoxWrap">
+    <div class="ci-box">
+      <!-- PUT YOUR COMIC DIALOGUE/NARRATION BOX IMAGE HERE -->
+      <!-- Folder: assets/intro/  |  File: dialogue-box.png (or .gif) -->
+      <img class="ci-box-img ai-style-change-2" id="ciBoxImg" src="assets/intro/dialogue-box.png" alt="" draggable="false">
+      <p class="ci-narration ai-style-change-3" id="ciNarration"><span class="intro-dialogue-text" id="ciNarrationText"></span><span class="ci-caret" id="ciCaret"></span><span class="ci-dots" id="ciDots"><span>.</span><span>.</span><span>.</span></span></p>
+    </div>
+  </div>
+
+  <div class="ci-swing-wrap" id="ciSwingWrap">
+    <!-- PUT YOUR SWINGING CHARACTER GIF HERE -->
+    <!-- Folder: assets/intro/  |  File: swing-character.gif -->
+    <!-- Sits fixed in the top-right corner; the GIF's own frames provide the motion. -->
+    <img class="ci-swinger" id="ciSwinger" data-src="assets/intro/swing-character.gif" alt="" draggable="false">
+    <p class="ci-sfx" id="ciSfx">THWIP!</p>
+  </div>
+
+  <div class="ci-blackout" id="ciBlackout"></div>
+
+  <!-- PAUSE/RESUME BUTTON — freezes the whole intro (timers + CSS animations)
+       so you can open devtools and tweak the dialogue box / GIF CSS live. -->
+  <button class="ci-pause-btn" id="ciPauseBtn" type="button" aria-label="Pause intro">⏸ PAUSE</button>
+
+  <!-- SKIP INTRO BUTTON — comic-impact burst style, CSS-only, no image asset needed -->
+  <button class="ci-skip-btn" id="ciSkipBtn" type="button" aria-label="Skip intro">
+    <span class="ci-skip-burst">
+      <span class="ci-skip-label">SKIP</span>
+    </span>
+  </button>
+</div>
+
+
+<div id="loader">
+  <div class="loader-mark">K·V</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  <p class="loader-tag">// entering the universe</p>
+</div>
+
+<audio id="webShotSfx" preload="auto"><source src="data:audio/mpeg;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAkAAA8ZwAHBw4ODhUVFRwcHCMjKioqMTExODg4QEBHR0dOTk5VVVVcXFxjY2pqanFxcXh4eICAh4eHjo6OlZWVnJyco6OqqqqxsbG4uLjAwMDHx87OztXV1dzc3OPj6urq8fHx+Pj4//8AAAA5TEFNRTMuOTcgAaoAAAAALjcAABSAJAbATgAAgAAAPGeYI8rGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//uQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuOTdVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuOTdVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uSZL6P8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjk3VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7kmT/j/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVgETd3d3T67u7old3cW6e7u7unu4GBgYtC3DiwMW4j3cO7uhdd3d0Su7u7p9d3d0Ku7u7p9d3d0Lru7uhddw4up7u7u6fXd3dPd3d3T67u7oW7u7unu7u7p7u7u6F13d3T3cO7i46OHj+AApu7u6FXd3d093d3dC3cDAxbiPcOBgb/+5Jk/4/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAAQtxHu4GLDi0Lru7unu7u7p9d3d0Su7u7p9d3d4Vru7uhdd3d093d3dC67hxbp7u7u6fXd3dCru7u6e7u7unu7u7p9d3d093Du4uToeHhnh4ePIM1ViblewksfsV38P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goCXhRmp+vxhQYUzYYVtG/pVQomrhVyql4Y9pxgwEzdjMal8aMDAV6GFPlNFk2iMjImmZHkysDBoZMrWS/7LAQdBxIoKGBg0cj/7DI1YKGBB0MmWW/5qwOxyMmWRyMv//zVrUcjVgoIE5GX/+ZMoYKDCORqyyOX7KCBOhkwUMFBhHIy+2ORqGChgQdHI1a3/NQwMGCCRd+KNNAUVFjXwEEhUMmQkLsxUWJGgZFBJ9ICFxX///+LpcoWZ1YFFRY1+LCpkyoXqTEFNRTMuOTeqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+5JkxI3TQWW7gGEagmsMh3EMw7RM7aKwIIBuAMMAVwAQjACqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqTEFNRTMuOTeqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//uSZM2P8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg==" type="audio/mpeg"></audio>
+
+<div class="cursor-dot" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div id="dimensionFlash"></div>
+
+<div id="eggOverlay"><div class="egg-vignette"></div></div>
+<div id="eggBanner">
+  <div class="egg-title">SPIDER-SENSE ACTIVATED</div>
+  <p class="egg-sub">// you found the konami web. nice work, neighbor.</p>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-logo">K·V</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#about" data-sfx="nav">About</a></li>
+    <li><a href="#skills" data-sfx="nav">Skills</a></li>
+    <li><a href="#projects" data-sfx="nav">Projects</a></li>
+    <li><a href="#journey" data-sfx="nav">Journey</a></li>
+    <li><a href="#contact" data-sfx="nav">Contact</a></li>
+  </ul>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" data-i="0">About</a>
+  <a href="#skills" data-i="1">Skills</a>
+  <a href="#projects" data-i="2">Projects</a>
+  <a href="#journey" data-i="3">Journey</a>
+  <a href="#contact" data-i="4">Contact</a>
+</div>
+<div class="web-thread"></div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-photo" id="heroPhoto"></div>
+  <div class="noise-layer"></div>
+
+  <!-- PARTICLES -->
+  <div id="particles"></div>
+
+  <!-- THREE.JS WEB FIELD CANVAS -->
+  <div id="webFieldCanvas" class="web-field-canvas"></div>
+
+  <!-- IDLE SPIDER EASTER EGG — drops in after a moment of stillness, click it -->
+  <div class="idle-spider" id="idleSpider">
+    <svg viewBox="0 0 30 60" xmlns="http://www.w3.org/2000/svg">
+      <line class="idle-spider-thread" x1="15" y1="0" x2="15" y2="14" stroke="rgba(245,234,216,0.4)" stroke-width="1"/>
+      <ellipse cx="15" cy="22" rx="6" ry="8" fill="var(--void)" stroke="var(--gold)" stroke-width="1.5"/>
+      <circle cx="15" cy="13" r="4" fill="var(--void)" stroke="var(--gold)" stroke-width="1.5"/>
+      <path d="M9 18 L2 14 M9 22 L1 24 M9 26 L3 32 M21 18 L28 14 M21 22 L29 24 M21 26 L27 32" stroke="var(--gold)" stroke-width="1.2" fill="none"/>
+    </svg>
+  </div>
+
+  <!-- SVG CITY SKYLINE -->
+  <svg class="skyline" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#09090f"/>
+        <stop offset="100%" stop-color="#0e0e1e"/>
+      </linearGradient>
+    </defs>
+    <!-- Far buildings -->
+    <rect x="0" y="250" width="80" height="150" fill="#0d0d20"/>
+    <rect x="60" y="200" width="60" height="200" fill="#0a0a18"/>
+    <rect x="100" y="230" width="50" height="170" fill="#0c0c1e"/>
+    <rect x="130" y="180" width="70" height="220" fill="#0b0b1c"/>
+    <rect x="180" y="220" width="45" height="180" fill="#0a0a18"/>
+    <rect x="200" y="160" width="55" height="240" fill="#0d0d22"/>
+    <rect x="240" y="240" width="40" height="160" fill="#0b0b1c"/>
+    <rect x="260" y="190" width="65" height="210" fill="#0a0a1a"/>
+    <rect x="310" y="170" width="80" height="230" fill="#0d0d24"/>
+    <rect x="370" y="210" width="50" height="190" fill="#0b0b1c"/>
+    <rect x="400" y="150" width="60" height="250" fill="#0a0a1a"/>
+    <rect x="440" y="200" width="70" height="200" fill="#0e0e26"/>
+    <rect x="490" y="170" width="55" height="230" fill="#0b0b1e"/>
+    <rect x="530" y="240" width="45" height="160" fill="#0a0a18"/>
+    <rect x="560" y="160" width="75" height="240" fill="#0d0d22"/>
+    <rect x="620" y="200" width="50" height="200" fill="#0b0b1c"/>
+    <rect x="650" y="180" width="60" height="220" fill="#0a0a1a"/>
+    <rect x="700" y="230" width="55" height="170" fill="#0d0d24"/>
+    <rect x="740" y="170" width="80" height="230" fill="#0b0b1e"/>
+    <rect x="800" y="210" width="45" height="190" fill="#0a0a18"/>
+    <rect x="830" y="190" width="65" height="210" fill="#0e0e26"/>
+    <rect x="880" y="150" width="70" height="250" fill="#0b0b1c"/>
+    <rect x="930" y="200" width="55" height="200" fill="#0a0a1a"/>
+    <rect x="970" y="160" width="60" height="240" fill="#0d0d22"/>
+    <rect x="1020" y="190" width="80" height="210" fill="#0b0b1e"/>
+    <rect x="1080" y="220" width="50" height="180" fill="#0a0a18"/>
+    <rect x="1120" y="170" width="80" height="230" fill="#0e0e26"/>
+    <!-- Windows (red and gold dots) -->
+    <rect x="70" y="208" width="3" height="2" fill="#e8272a" opacity="0.6"/>
+    <rect x="78" y="215" width="3" height="2" fill="#f5c518" opacity="0.4"/>
+    <rect x="140" y="190" width="3" height="2" fill="#e8272a" opacity="0.5"/>
+    <rect x="148" y="198" width="3" height="2" fill="#f5c518" opacity="0.3"/>
+    <rect x="205" y="172" width="3" height="2" fill="#e8272a" opacity="0.6"/>
+    <rect x="213" y="180" width="3" height="2" fill="#e8272a" opacity="0.4"/>
+    <rect x="270" y="200" width="3" height="2" fill="#f5c518" opacity="0.5"/>
+    <rect x="320" y="178" width="3" height="2" fill="#e8272a" opacity="0.6"/>
+    <rect x="330" y="186" width="3" height="2" fill="#f5c518" opacity="0.3"/>
+    <rect x="405" y="158" width="3" height="2" fill="#e8272a" opacity="0.5"/>
+    <rect x="413" y="166" width="3" height="2" fill="#e8272a" opacity="0.4"/>
+    <rect x="448" y="208" width="3" height="2" fill="#f5c518" opacity="0.5"/>
+    <rect x="565" y="168" width="3" height="2" fill="#e8272a" opacity="0.6"/>
+    <rect x="575" y="176" width="3" height="2" fill="#f5c518" opacity="0.4"/>
+    <rect x="660" y="188" width="3" height="2" fill="#e8272a" opacity="0.5"/>
+    <rect x="750" y="178" width="3" height="2" fill="#f5c518" opacity="0.6"/>
+    <rect x="760" y="186" width="3" height="2" fill="#e8272a" opacity="0.4"/>
+    <rect x="840" y="198" width="3" height="2" fill="#e8272a" opacity="0.5"/>
+    <rect x="890" y="158" width="3" height="2" fill="#f5c518" opacity="0.6"/>
+    <rect x="900" y="166" width="3" height="2" fill="#e8272a" opacity="0.4"/>
+    <rect x="980" y="168" width="3" height="2" fill="#e8272a" opacity="0.5"/>
+    <rect x="990" y="176" width="3" height="2" fill="#f5c518" opacity="0.3"/>
+    <rect x="1030" y="198" width="3" height="2" fill="#e8272a" opacity="0.6"/>
+    <rect x="1125" y="178" width="3" height="2" fill="#f5c518" opacity="0.5"/>
+    <!-- Web lines across skyline -->
+    <path class="web-draw" d="M0 300 Q300 200 600 280 Q900 360 1200 260" stroke="rgba(255,255,255,0.04)" stroke-width="1" fill="none"/>
+    <path class="web-draw" d="M100 350 Q400 250 700 320 Q1000 390 1200 300" stroke="rgba(255,255,255,0.03)" stroke-width="0.5" fill="none" style="animation-delay:0.15s"/>
+    <path class="web-draw" d="M600 0 Q500 150 350 280" stroke="rgba(232,39,42,0.12)" stroke-width="1" fill="none" style="animation-delay:0.3s"/>
+    <path class="web-draw" d="M600 0 Q700 160 850 290" stroke="rgba(232,39,42,0.1)" stroke-width="1" fill="none" style="animation-delay:0.42s"/>
+    <path class="web-draw" d="M600 0 Q580 200 400 350" stroke="rgba(232,39,42,0.07)" stroke-width="0.5" fill="none" style="animation-delay:0.54s"/>
+    <path class="web-draw" d="M600 0 Q620 200 800 360" stroke="rgba(232,39,42,0.07)" stroke-width="0.5" fill="none" style="animation-delay:0.66s"/>
+    <!-- Ground -->
+    <rect x="0" y="390" width="1200" height="20" fill="#09090f"/>
+  </svg>
+
+  <!-- HERO CONTENT -->
+  <div class="hero-center">
+    <p class="signal-text entrance" style="animation-delay:0.1s">// UNKNOWN SIGNAL DETECTED...</p>
+    <p class="hero-welcome entrance" style="animation-delay:0.22s">Welcome to my <span class="universe-word" id="universeWord" data-glitch-text="universe">universe</span></p>
+    <h1 class="hero-name entrance" style="animation-delay:0.34s">KRISH<br><span class="glitch-red">MAJHI</span></h1>
+    <div class="hero-roles entrance" style="animation-delay:0.5s">
+      <span class="role-pill">Frontend Dev</span>
+      <span class="role-pill">React Developer</span>
+      <span class="role-pill">FastAPI Learner</span>
+    </div>
+    <div class="hero-btns entrance" style="animation-delay:0.62s">
+      <a href="#projects" class="btn-primary magnetic" data-sfx="nav">Explore Projects</a>
+      <a href="#contact" class="btn-secondary magnetic" data-sfx="nav">Contact Me</a>
+    </div>
+    <a href="#about" class="scroll-cue" aria-label="Scroll down">
+      <span></span>
+    </a>
+  </div>
+</section>
+
+<div class="panel-divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="noise-layer"></div>
+  <div class="container">
+    <div class="reveal">
+      <div class="section-frame"><span>Origin Story</span></div>
+      <h2 class="section-title">About Me</h2>
+      <p class="section-subtitle">Every hero has a story. Every developer has a stack. Here's mine.</p>
+    </div>
+
+    <div class="comic-grid reveal">
+      <div class="comic-panel">
+        <div class="ink-wipe"></div>
+        <div class="panel-number">01</div>
+        <div class="panel-tag">Who I Am</div>
+        <div class="panel-accent"></div>
+        <h3 class="panel-heading">The Developer Next Door</h3>
+        <p class="panel-body">A self-driven frontend developer with an obsession for building things that feel as good as they look. Not born with superpowers — just a browser and a lot of curiosity.</p>
+      </div>
+
+      <div class="comic-panel" style="grid-row: 1 / 3; min-height: 420px;">
+        <div class="ink-wipe"></div>
+        <div class="panel-large-text">CODE</div>
+        <div class="panel-number" style="font-size:5rem">02</div>
+        <div class="panel-tag">My Learning Journey</div>
+        <div class="panel-accent"></div>
+        <h3 class="panel-heading">From HTML Tags to Full Systems</h3>
+        <p class="panel-body">Started with a single HTML file. Grew through CSS frustrations, JavaScript epiphanies, React rabbit holes, and backend awakening via FastAPI. Still learning. Always will be.</p>
+      </div>
+
+      <div class="comic-panel">
+        <div class="ink-wipe"></div>
+        <div class="panel-number">03</div>
+        <div class="panel-tag">Future Goals</div>
+        <div class="panel-accent"></div>
+        <h3 class="panel-heading">Land My First Dev Role</h3>
+        <p class="panel-body">The mission: build real products, ship great interfaces, and contribute to teams where design and engineering coexist. Currently: Clothzy. Next: the world.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="panel-divider"></div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="noise-layer"></div>
+  <div class="container">
+    <div class="reveal">
+      <div class="section-frame"><span>Spider Sense</span></div>
+      <h2 class="section-title">Skills</h2>
+      <p class="section-subtitle">My arsenal — built through projects, not classrooms.</p>
+    </div>
+
+    <div class="skills-layout reveal">
+      <div class="radar-wrap">
+        <svg viewBox="0 0 320 320" width="320" height="320" xmlns="http://www.w3.org/2000/svg" id="radarSvg">
+          <defs>
+            <radialGradient id="radarGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(232,39,42,0.12)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+          <!-- Radar rings -->
+          <circle cx="160" cy="160" r="130" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <circle cx="160" cy="160" r="95" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <circle cx="160" cy="160" r="60" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <circle cx="160" cy="160" r="25" fill="rgba(232,39,42,0.1)" stroke="rgba(232,39,42,0.3)" stroke-width="1"/>
+          <!-- Web lines (spokes) -->
+          <line x1="160" y1="30" x2="160" y2="290" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+          <line x1="30" y1="160" x2="290" y2="160" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+          <line x1="67.9" y1="67.9" x2="252.1" y2="252.1" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+          <line x1="252.1" y1="67.9" x2="67.9" y2="252.1" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+          <!-- Radar fill polygon -->
+          <polygon id="radarPoly" points="160,70 240,120 230,210 160,245 90,210 80,120" fill="rgba(232,39,42,0.08)" stroke="rgba(232,39,42,0.4)" stroke-width="1.5"/>
+          <!-- Center dot -->
+          <circle cx="160" cy="160" r="4" fill="var(--red)"/>
+          <!-- Rotating sweep -->
+          <line id="radarSweep" x1="160" y1="160" x2="160" y2="30" stroke="rgba(232,39,42,0.3)" stroke-width="1"/>
+          <!-- Skill node points (tied to skill cards via data-skill) -->
+          <circle class="radar-node" data-skill="react" cx="160" cy="70" r="5" fill="var(--gold)"/>
+          <circle class="radar-node" data-skill="javascript" cx="240" cy="120" r="5" fill="var(--gold)"/>
+          <circle class="radar-node" data-skill="python" cx="230" cy="210" r="5" fill="var(--gold)"/>
+          <circle class="radar-node" data-skill="fastapi" cx="160" cy="245" r="5" fill="var(--gold)"/>
+          <circle class="radar-node" data-skill="css" cx="90" cy="210" r="5" fill="var(--gold)"/>
+          <circle class="radar-node" data-skill="git" cx="80" cy="120" r="5" fill="var(--gold)"/>
+          <!-- Skill labels -->
+          <text x="160" y="22" text-anchor="middle" font-family="Bangers, cursive" font-size="13" fill="rgba(240,234,216,0.7)" letter-spacing="1">REACT</text>
+          <text x="258" y="116" text-anchor="start" font-family="Bangers, cursive" font-size="13" fill="rgba(240,234,216,0.7)" letter-spacing="1">JS</text>
+          <text x="248" y="220" text-anchor="start" font-family="Bangers, cursive" font-size="13" fill="rgba(240,234,216,0.7)" letter-spacing="1">PYTHON</text>
+          <text x="160" y="266" text-anchor="middle" font-family="Bangers, cursive" font-size="13" fill="rgba(240,234,216,0.7)" letter-spacing="1">FASTAPI</text>
+          <text x="50" y="220" text-anchor="end" font-family="Bangers, cursive" font-size="13" fill="rgba(240,234,216,0.7)" letter-spacing="1">SQL</text>
+          <text x="52" y="116" text-anchor="end" font-family="Bangers, cursive" font-size="13" fill="rgba(240,234,216,0.7)" letter-spacing="1">GIT</text>
+        </svg>
+      </div>
+
+      <div class="skill-cards">
+        <div class="skill-card" data-skill="react">
+          <div class="skill-name">React</div>
+          <div class="skill-level">■■■■□ Advanced</div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="80" style="width:0%"></div></div>
+        </div>
+        <div class="skill-card" data-skill="javascript">
+          <div class="skill-name">JavaScript</div>
+          <div class="skill-level">■■■■□ Proficient</div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="78" style="width:0%"></div></div>
+        </div>
+        <div class="skill-card" data-skill="python">
+          <div class="skill-name">Python</div>
+          <div class="skill-level">■■■□□ Growing</div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="55" style="width:0%"></div></div>
+        </div>
+        <div class="skill-card" data-skill="fastapi">
+          <div class="skill-name">FastAPI</div>
+          <div class="skill-level">■■■□□ Learning</div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="50" style="width:0%"></div></div>
+        </div>
+        <div class="skill-card" data-skill="css">
+          <div class="skill-name">CSS</div>
+          <div class="skill-level">■■■■■ Strong</div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="88" style="width:0%"></div></div>
+        </div>
+        <div class="skill-card" data-skill="git">
+          <div class="skill-name">Git</div>
+          <div class="skill-level">■■■□□ Solid</div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="62" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="panel-divider"></div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="noise-layer"></div>
+  <div class="container">
+    <div class="reveal">
+      <div class="section-frame"><span>The Multiverse</span></div>
+      <h2 class="section-title projects-title" id="projectsTitle" data-glitch-text="Projects">Projects</h2>
+      <p class="section-subtitle">Every build is a universe of its own. Enter at your own risk.</p>
+    </div>
+
+    <div class="projects-grid reveal">
+      <div class="project-card" data-universe="// UNIVERSE 01">
+        <div class="project-card-bg">CLZ</div>
+        <div class="project-name">Clothzy</div>
+        <p class="project-desc">A full-featured fashion e-commerce platform. Profiles, wishlists, orders dashboard, and a design system built from scratch in cream, gold, and ink.</p>
+        <div class="project-tags">
+          <span class="tag">React</span>
+          <span class="tag">CSS Modules</span>
+          <span class="tag">FastAPI</span>
+          <span class="tag">Figma</span>
+        </div>
+        <div class="project-links">
+          <a href="#" class="project-link" data-sfx="enter">GitHub →</a>
+          <a href="#" class="project-link" data-sfx="enter">Live Demo →</a>
+        </div>
+      </div>
+
+      <div class="project-card" data-universe="// UNIVERSE 02">
+        <div class="project-card-bg">SWG</div>
+        <div class="project-name">Swiggy Clone</div>
+        <p class="project-desc">A food delivery UI clone — real restaurant data, live API integration, cart state, and responsive design. Built to understand React patterns deeply.</p>
+        <div class="project-tags">
+          <span class="tag">React</span>
+          <span class="tag">Redux</span>
+          <span class="tag">Tailwind</span>
+          <span class="tag">REST API</span>
+        </div>
+        <div class="project-links">
+          <a href="#" class="project-link" data-sfx="enter">GitHub →</a>
+          <a href="#" class="project-link" data-sfx="enter">Live Demo →</a>
+        </div>
+      </div>
+
+      <div class="project-card" data-universe="// UNIVERSE 03">
+        <div class="project-card-bg">KV</div>
+        <div class="project-name">This Portfolio</div>
+        <p class="project-desc">KRISHVERSE itself — a Spider-Verse inspired developer portfolio with comic aesthetics, parallax city, animated panels, and web-shooting transitions.</p>
+        <div class="project-tags">
+          <span class="tag">React</span>
+          <span class="tag">GSAP</span>
+          <span class="tag">Framer Motion</span>
+          <span class="tag">Lenis</span>
+        </div>
+        <div class="project-links">
+          <a href="#" class="project-link" data-sfx="enter">GitHub →</a>
+        </div>
+      </div>
+
+      <div class="project-card" data-universe="// UNIVERSE 04" style="border-style: dashed; opacity: 0.6;">
+        <div class="project-card-bg">AI</div>
+        <div class="project-name">Coming Soon</div>
+        <p class="project-desc">Something with AI. Something that solves a real problem. Currently in the ideation dimension. Stay tuned, neighbor.</p>
+        <div class="project-tags">
+          <span class="tag">TBD</span>
+          <span class="tag">AI/ML</span>
+          <span class="tag">FastAPI</span>
+        </div>
+      </div>
+
+      <div class="project-card secret" data-universe="// UNIVERSE 0∞" id="secretCard">
+        <div class="project-card-bg">???</div>
+        <div class="project-name">The Anomaly</div>
+        <p class="project-desc">A hidden dimension only visible to those who know the sequence. You found it by clicking the logo three times, or by channeling your inner '80s gamer. Either way — respect.</p>
+        <div class="project-tags">
+          <span class="tag">Secret</span>
+          <span class="tag">Curiosity</span>
+          <span class="tag">You</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="secret-hint" id="secretHint">// psst — every multiverse has a hidden corner. try clicking around.</p>
+  </div>
+</section>
+
+<div class="panel-divider"></div>
+
+<!-- JOURNEY -->
+<section id="journey">
+  <div class="noise-layer"></div>
+  <div class="container">
+    <div class="reveal">
+      <div class="section-frame"><span>Hero Progression</span></div>
+      <h2 class="section-title">The Journey</h2>
+      <p class="section-subtitle">Every developer has an origin arc. This is mine — power by power.</p>
+    </div>
+
+    <div class="journey-web reveal">
+      <div class="journey-node achieved">
+        <div class="node-label">HTML & CSS</div>
+        <div class="node-year">Level 1 — The Beginning</div>
+      </div>
+      <div class="journey-node achieved">
+        <div class="node-label">JavaScript</div>
+        <div class="node-year">Level 2 — Things Started Moving</div>
+      </div>
+      <div class="journey-node achieved">
+        <div class="node-label">React</div>
+        <div class="node-year">Level 3 — Components Clicked</div>
+      </div>
+      <div class="journey-node achieved">
+        <div class="node-label">CSS Modules</div>
+        <div class="node-year">Level 4 — Style Got Serious</div>
+      </div>
+      <div class="journey-node achieved">
+        <div class="node-label">Swiggy Clone</div>
+        <div class="node-year">Level 5 — First Real Mission</div>
+      </div>
+      <div class="journey-node achieved">
+        <div class="node-label">Python</div>
+        <div class="node-year">Level 6 — Backend Begins</div>
+      </div>
+      <div class="journey-node achieved">
+        <div class="node-label">FastAPI</div>
+        <div class="node-year">Level 7 — APIs Understood</div>
+      </div>
+      <div class="journey-node achieved">
+        <div class="node-label">Clothzy</div>
+        <div class="node-year">Level 8 — Biggest Build Yet</div>
+      </div>
+      <div class="journey-node future">
+        <div class="node-label">First Dev Job</div>
+        <div class="node-year">Level 9 — Loading...</div>
+      </div>
+      <div class="journey-node future horizon">
+        <div class="node-label">Future Goals</div>
+        <div class="node-year">Level ∞ — Still Being Written</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="stats-grid">
+    <div class="stat-block">
+      <div class="halftone halftone-light"></div>
+      <div class="stat-num" data-target="4">0</div>
+      <div class="stat-label">Projects Built</div>
+    </div>
+    <div class="stat-block">
+      <div class="halftone halftone-light"></div>
+      <div class="stat-num" data-target="8">0</div>
+      <div class="stat-label">Tech Learned</div>
+    </div>
+    <div class="stat-block">
+      <div class="halftone halftone-light"></div>
+      <div class="stat-num" data-target="500">0</div>
+      <div class="stat-label">GitHub Commits</div>
+    </div>
+    <div class="stat-block">
+      <div class="halftone halftone-light"></div>
+      <div class="stat-num" data-target="1000">0</div>
+      <div class="stat-label">Hours Coded</div>
+    </div>
+  </div>
+</section>
+
+<div class="panel-divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="noise-layer"></div>
+  <svg class="contact-web-bg" id="contactWebBg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- radial spokes -->
+    <path class="web-grow-line" d="M400 300 L400 20"/>
+    <path class="web-grow-line" d="M400 300 L620 90"/>
+    <path class="web-grow-line" d="M400 300 L760 300"/>
+    <path class="web-grow-line" d="M400 300 L620 510"/>
+    <path class="web-grow-line" d="M400 300 L400 580"/>
+    <path class="web-grow-line" d="M400 300 L180 510"/>
+    <path class="web-grow-line" d="M400 300 L40 300"/>
+    <path class="web-grow-line" d="M400 300 L180 90"/>
+    <!-- concentric rings -->
+    <path class="web-grow-ring" d="M400 230 Q540 230 540 300 Q540 370 400 370 Q260 370 260 300 Q260 230 400 230 Z"/>
+    <path class="web-grow-ring" d="M400 150 Q620 150 620 300 Q620 450 400 450 Q180 450 180 300 Q180 150 400 150 Z" style="animation-delay:0.15s"/>
+    <path class="web-grow-ring" d="M400 70 Q700 70 700 300 Q700 530 400 530 Q100 530 100 300 Q100 70 400 70 Z" style="animation-delay:0.3s"/>
+  </svg>
+
+  <div class="spider-descend" id="spiderDescend">
+    <svg viewBox="0 0 30 60" xmlns="http://www.w3.org/2000/svg">
+      <line x1="15" y1="0" x2="15" y2="14" stroke="rgba(245,234,216,0.4)" stroke-width="1"/>
+      <ellipse cx="15" cy="22" rx="6" ry="8" fill="var(--void)" stroke="var(--red)" stroke-width="1.5"/>
+      <circle cx="15" cy="13" r="4" fill="var(--void)" stroke="var(--red)" stroke-width="1.5"/>
+      <path d="M9 18 L2 14 M9 22 L1 24 M9 26 L3 32 M21 18 L28 14 M21 22 L29 24 M21 26 L27 32" stroke="var(--red)" stroke-width="1.2" fill="none"/>
+    </svg>
+  </div>
+
+  <div class="container">
+    <div class="contact-layout">
+      <div class="reveal">
+        <div class="section-frame"><span>Final Mission</span></div>
+        <h2 class="section-title">Contact</h2>
+        <p class="section-subtitle">Found me at the top. Drop a message — I'll swing by.</p>
+        <div class="contact-links">
+          <a href="mailto:krish@example.com" class="contact-link-item" data-sfx="enter">
+            <div class="contact-link-icon">@</div>
+            <div>
+              <div class="contact-link-label">Email</div>
+              <div class="contact-link-value">krish@example.com</div>
+            </div>
+          </a>
+          <a href="https://linkedin.com" class="contact-link-item" target="_blank" data-sfx="enter">
+            <div class="contact-link-icon">in</div>
+            <div>
+              <div class="contact-link-label">LinkedIn</div>
+              <div class="contact-link-value">/in/krishmajhi</div>
+            </div>
+          </a>
+          <a href="https://github.com" class="contact-link-item" target="_blank" data-sfx="enter">
+            <div class="contact-link-icon">&lt;/&gt;</div>
+            <div>
+              <div class="contact-link-label">GitHub</div>
+              <div class="contact-link-value">github.com/krishmajhi</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="contact-form-wrap reveal">
+        <div class="form-field">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" placeholder="Peter Parker" id="contactName"/>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="parker@daily-bugle.com" id="contactEmail"/>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Message</label>
+          <textarea class="form-textarea" placeholder="Your message here..." id="contactMsg"></textarea>
+        </div>
+        <button class="btn-primary" style="align-self:flex-start; font-size:1rem;" onclick="sendMessage()" data-sfx="enter">SEND IT →</button>
+        <p id="formFeedback" style="font-size:0.65rem;font-family:'Space Mono',monospace;color:var(--red);opacity:0;transition:opacity 0.4s;letter-spacing:2px;margin-top:0.25rem;"></p>
+      </div>
+    </div>
+
+    <p class="adventure-line">// the adventure doesn't end here.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p class="footer-quote">"With great <span>code</span> comes great responsibility."</p>
+  <p class="footer-copy">© 2025 Krish Majhi — KRISHVERSE · Built in this dimension</p>
+</footer>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SCRIPTS — load order matters: intro.js declares prefersReducedMotion
+     which core.js and effects.js both depend on. core.js declares
+     hasFinePointer which effects.js depends on. Keep this exact order.
+═══════════════════════════════════════════════════════════════════════ -->
+<script src="js/intro.js"></script>
+<script src="js/core.js"></script>
+<script src="js/effects.js"></script>
+
+</body>
+</html>
