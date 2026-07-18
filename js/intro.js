@@ -4,8 +4,8 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 // ---- site (this file's intro thwip + effects.js's playSfx). Flip ----
 // ---- back to true whenever sound should return; nothing else needs ----
 // ---- to change. Declared here because intro.js loads/runs first. ----
-window.SFX_ENABLED = true;
-
+// window.SFX_ENABLED = true;
+// this is used for sound
   // ── COMIC NARRATOR INTRO ───────────────────────────────────────────────────
   (function() {
     const intro = document.getElementById('comic-intro');
